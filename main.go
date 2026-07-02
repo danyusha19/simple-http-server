@@ -16,12 +16,14 @@ var mtx = sync.Mutex{}
 func payHandler(w http.ResponseWriter, r *http.Request) {
 	httpRequestBody, err := io.ReadAll(r.Body)
 	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+
 		msg := "fail to read HTTP body: " + err.Error()
 		fmt.Println(msg)
 
 		_, err = w.Write([]byte(msg))
 		if err != nil {
-			fmt.Println("fail to write HTTP response")
+			fmt.Println("fail to write HTTP response", err)
 			return
 		}
 		return
@@ -31,7 +33,16 @@ func payHandler(w http.ResponseWriter, r *http.Request) {
 
 	paymentAmount, err := strconv.Atoi(httpRequestBodyString)
 	if err != nil {
-		fmt.Println("fail to convert HTTP body to integer:", err)
+		w.WriteHeader(http.StatusBadRequest)
+
+		msg := "fail to convert HTTP body to integer:" + err.Error()
+		fmt.Println(msg)
+
+		_, err = w.Write([]byte(msg))
+		if err != nil {
+			fmt.Println("fail to write HTTP response", err)
+			return
+		}
 		return
 	}
 
@@ -43,7 +54,7 @@ func payHandler(w http.ResponseWriter, r *http.Request) {
 
 		_, err = w.Write([]byte(msg))
 		if err != nil {
-			fmt.Println("fail to write HTTP response")
+			fmt.Println("fail to write HTTP response", err)
 			return
 		}
 	} else {
@@ -52,7 +63,7 @@ func payHandler(w http.ResponseWriter, r *http.Request) {
 
 		_, err = w.Write([]byte(msg))
 		if err != nil {
-			fmt.Println("fail to write HTTP response")
+			fmt.Println("fail to write HTTP response", err)
 			return
 		}
 	}
@@ -62,12 +73,14 @@ func payHandler(w http.ResponseWriter, r *http.Request) {
 func saveHandler(w http.ResponseWriter, r *http.Request) {
 	httpRequestBody, err := io.ReadAll(r.Body)
 	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+
 		msg := "fail to read HTTP body:" + err.Error()
 		fmt.Println(msg)
 
 		_, err = w.Write([]byte(msg))
 		if err != nil {
-			fmt.Println("fail to write HTTP response")
+			fmt.Println("fail to write HTTP response", err)
 			return
 		}
 		return
@@ -76,12 +89,14 @@ func saveHandler(w http.ResponseWriter, r *http.Request) {
 
 	saveAmount, err := strconv.Atoi(httpRequestBodyString)
 	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+
 		msg := "fail to convert HTTP body to integer: " + err.Error()
 		fmt.Println(msg)
 
 		_, err = w.Write([]byte(msg))
 		if err != nil {
-			fmt.Println("fail to write HTTP response")
+			fmt.Println("fail to write HTTP response", err)
 			return
 		}
 		return
@@ -97,7 +112,7 @@ func saveHandler(w http.ResponseWriter, r *http.Request) {
 
 		_, err = w.Write([]byte(msg))
 		if err != nil {
-			fmt.Println("fail to write HTTP response")
+			fmt.Println("fail to write HTTP response", err)
 			return
 		}
 	} else {
@@ -106,7 +121,7 @@ func saveHandler(w http.ResponseWriter, r *http.Request) {
 
 		_, err = w.Write([]byte(msg))
 		if err != nil {
-			fmt.Println("fail to write HTTP response")
+			fmt.Println("fail to write HTTP response", err)
 		}
 	}
 	mtx.Unlock()
